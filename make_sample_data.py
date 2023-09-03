@@ -6,10 +6,14 @@ from scipy.io.wavfile import write
 import codecs
 import os
 import random
+from parallel_wavegan.utils import download_pretrained_model
 
-TrainExe = './ecog2text_train.py'
-TestExe = './ecog2text_eval.py'
-Conf = './conf/config_xA000.ini'
+
+TrainExe = './ecog2audio_train.py'
+TestExe = './ecog2audio_eval.py'
+Conf_no = 'xA001'
+Conf = './conf/config_' + Conf_no + '.ini'
+AudioExe = './audio_reconstruction.py'
 
 NumTrain = 64 # The number of training
 NumTest = 16 # The number of test
@@ -39,7 +43,7 @@ def make_dummy_data(Num, mode, elecfile):
 
         # add to list file
         ofp.write(ECoGFileName + ',' + str(Freq) + ',' + WavFileName + ',' + random.choice(Vocab) + ',' + elecfile + '\n')
-        
+
     ofp.close()
     return 'sample_list_' + mode + '.csv'
 
@@ -49,14 +53,28 @@ if __name__ == '__main__':
     line = ','.join([str(i+1) for i in range(NumElectrodes)])
     ofp.write(line + '\n')
     ofp.close()
-    
+
     # prepare data
     list_ts = make_dummy_data(NumTest, 'test', 'sample_elec.csv')
     list_tr = make_dummy_data(NumTrain, 'train', 'sample_elec.csv')
-    
-    # make sample exe
-    ofp = codecs.open('sample_run.sh', 'w', 'utf-8')
+
+    # # make sample exe (for ecog2text)
+    # ofp = codecs.open('sample_run.sh', 'w', 'utf-8')
+    # ofp.write('#!/bin/bash\n\n')
+    # ofp.write(TrainExe + ' ' + list_tr + ' ' + Conf + ' --model sample\n\n')
+    # ofp.write(TestExe + ' ' + list_ts + ' exp/xA000_sample_train/sample\n')
+    # ofp.close()
+
+    # make sample exe (for ecog2audio)
+    ofp = codecs.open('sample_run_audio.sh', 'w', 'utf-8')
     ofp.write('#!/bin/bash\n\n')
     ofp.write(TrainExe + ' ' + list_tr + ' ' + Conf + ' --model sample\n\n')
-    ofp.write(TestExe + ' ' + list_ts + ' exp/xA000_sample_train/sample\n')
+    ofp.write(TestExe + ' ' + list_ts + ' exp/' + Conf_no + '_sample_train/sample\n\n')
+    ofp.write(AudioExe + ' ' + list_ts + ' exp/' + Conf_no + '_sample_train/sample\n')
     ofp.close()
+
+
+    # download parallel wavegan pretrained model
+    download_pretrained_model("jsut_parallel_wavegan.v1", "pretrained_model")
+
+
