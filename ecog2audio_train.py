@@ -271,7 +271,6 @@ if __name__ == '__main__':
     ch_sum = False
     part_sum = False
     band_sum = True
-    zscore_hayashi = False
     car = True
 
     input_attn = True
@@ -286,8 +285,6 @@ if __name__ == '__main__':
             band_sum = conf['FEAT'].getboolean('band_sum')
         if 'part_sum' in conf['FEAT']:
             part_sum = conf['FEAT'].getboolean('part_sum')
-        if 'zscore_hayashi' in conf['FEAT']:
-            zscore_hayashi = conf['FEAT'].getboolean('zscore_hayashi')
         if 'car' in conf['FEAT']:
             car = conf['FEAT'].getboolean('car')
 
@@ -312,7 +309,7 @@ if __name__ == '__main__':
     else:
         meldump = False
 
-    ecog_data, audio_feat_data, tokens, tokenizer, audio_feat_padding = preprocessingX(args.data_csv, conf, car, ch_sum, part_sum, band_sum, zscore_hayashi, outmodeldir, meldump)
+    ecog_data, audio_feat_data, tokens, tokenizer, audio_feat_padding = preprocessingX(args.data_csv, conf, car, ch_sum, part_sum, band_sum, outmodeldir, meldump)
 
 
     tokens = np.array(tokens)
