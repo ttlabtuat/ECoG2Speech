@@ -333,7 +333,6 @@ if __name__ == '__main__':
     ch_sum = False
     band_sum = True
     part_sum = True
-    zscore_hayashi = False
     car = True
 
 
@@ -351,8 +350,6 @@ if __name__ == '__main__':
         if 'part_sum' in conf['FEAT']:
             part_sum = conf['FEAT'].getboolean('part_sum')
 
-        if 'zscore_hayashi' in conf['FEAT']:
-            zscore_hayashi = conf['FEAT'].getboolean('zscore_hayashi')
 
         if 'car' in conf['FEAT']:
             car = conf['FEAT'].getboolean('car')
@@ -364,7 +361,7 @@ if __name__ == '__main__':
 #    print(ch_sum)
 #    exit()
 
-    ecog_data, mfcc_data, tokens, tokenizer = preprocessingX(args.data_csv, conf, car, ch_sum, part_sum, band_sum, zscore_hayashi) 
+    ecog_data, mfcc_data, tokens, tokenizer, _ = preprocessingX(args.data_csv, conf, car, ch_sum, part_sum, band_sum) 
    
     ConvType = ''
 

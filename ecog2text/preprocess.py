@@ -319,7 +319,7 @@ def plot_ecog(ecogs, num, file_name):
 
 
 
-def ecog_preprocess(ecog, fs, chs, refs, car, ch_sum, part_sum, band_sum, zscore_hayashi=True):
+def ecog_preprocess(ecog, fs, chs, refs, car, ch_sum, part_sum, band_sum):
     num_ch = ecog.shape[1]
     ecog_part = ecog
 
@@ -395,17 +395,8 @@ def ecog_preprocess(ecog, fs, chs, refs, car, ch_sum, part_sum, band_sum, zscore
     ecog_200 = signal.decimate(ecog_ave, int(400/200))
     # print('ecog_200 shape:\t', ecog_200.shape)
 
-    if zscore_hayashi:
-        ecog_z = mf.z_scored(ecog_200,0.3,200)
-    else:
-        ecog_z = stats.zscore(ecog_200, axis=-1)
-        # 時系列次元について，zscore が計算できていることを確認済み
-        #np.savetxt('ecog_200.csv', ecog_200[0][0],delimiter=',')
-        #np.savetxt('ecog_z.csv', ecog_z[0][0],delimiter=',')
+    ecog_z = stats.zscore(ecog_200, axis=-1)
 
-    #print(ecog_z.shape)
-    #print(ecog_z.transpose().shape)
-    #exit()
 
     return ecog_z
 
@@ -571,7 +562,7 @@ def prep_dataX(ecogs_preprocess, audio_feat, transcripts, strides,conf, shuffle=
 
 
 
-def preprocessing(data_csv, conf, car, ch_sum, part_sum, band_sum, zscore_hayashi):
+def preprocessing(data_csv, conf, car, ch_sum, part_sum, band_sum):
 
     file_id, ecogs, ecogs_fs, audio_feat, transcripts_, electrodes = read_data(data_csv)
 
@@ -581,13 +572,13 @@ def preprocessing(data_csv, conf, car, ch_sum, part_sum, band_sum, zscore_hayash
     for ecog, fs, electrode in zip (ecogs, ecogs_fs, electrodes):
         elecs, refs = read_channels(electrode)
 
-        ecog_prop = ecog_preprocess(ecog, fs, elecs, refs, car, ch_sum, part_sum, band_sum, zscore_hayashi=zscore_hayashi)
+        ecog_prop = ecog_preprocess(ecog, fs, elecs, refs, car, ch_sum, part_sum, band_sum)
         ecogs_preprocess.append(ecog_prop.transpose())
 
 
     return prep_data(ecogs_preprocess, audio_feat, transcripts_, int(conf['INPUTCONV']['strides']))
 
-def preprocessingX(data_csv, conf, car, ch_sum, part_sum, band_sum, zscore_hayashi, outmodeldir=None, meldump=False):
+def preprocessingX(data_csv, conf, car, ch_sum, part_sum, band_sum, outmodeldir=None, meldump=False):
 
     file_id, ecogs, ecogs_fs, audio_feat, transcripts_, electrodes = read_data(data_csv, conf, outmodeldir, meldump)
 
@@ -598,7 +589,7 @@ def preprocessingX(data_csv, conf, car, ch_sum, part_sum, band_sum, zscore_hayas
     for ecog, fs, electrode in zip (ecogs, ecogs_fs, electrodes):
         elecs, refs = read_channels(electrode)
 
-        ecog_prop = ecog_preprocess(ecog, fs, elecs, refs, car, ch_sum, part_sum, band_sum, zscore_hayashi=zscore_hayashi)
+        ecog_prop = ecog_preprocess(ecog, fs, elecs, refs, car, ch_sum, part_sum, band_sum)
         print('loop:', loop_count+1)
         print('ecog prepro shape:\t',ecog_prop.transpose().shape)
         ecogs_preprocess.append(ecog_prop.transpose())
