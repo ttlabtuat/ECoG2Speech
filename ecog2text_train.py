@@ -283,7 +283,7 @@ if __name__ == '__main__':
         print('Already exists')
         exit()
 
-    ecog_data, mfcc_data, tokens, tokenizer = preprocessingX(args.data_csv, conf, car, ch_sum, part_sum, band_sum, zscore_hayashi)
+    ecog_data, mfcc_data, tokens, tokenizer, _ = preprocessingX(args.data_csv, conf, car, ch_sum, part_sum, band_sum, zscore_hayashi)
 
     tokens = np.array(tokens)
     print(type(ecog_data), type(mfcc_data), type(tokens))
