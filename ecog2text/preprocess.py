@@ -346,10 +346,13 @@ def ecog_preprocess(ecog, fs, chs, refs, car, ch_sum, part_sum, band_sum):
         ecog_part = ecog[used_chs,:]
         #np.savetxt('dbg_bipola.txt', ecog_part)
 
-    ecog_lowpass = mf.lowpassFilter(ecog_part, fs, 200, axis=1, order=7)
-    #print(ecog_lowpass.shape)
-    ecog_400 = signal.decimate(ecog_lowpass, int(fs/400))
-    #print(ecog_400.shape)
+    # decimateのローパスフィルタの設定が適していないため修正    
+    # ecog_lowpass = mf.lowpassFilter(ecog_part, fs, 200, axis=1, order=7)
+    # print('ecog_lowpass shape:\t', ecog_lowpass.shape)
+    # ecog_400 = signal.decimate(ecog_lowpass, int(fs/400))
+    # 時間軸はaxis=1(shape[-1])
+    ecog_400 = signal.resample(ecog_part, int(ecog_part.shape[-1] * 400 / fs), axis=1)
+    # print('ecog_400 shape:\t', ecog_400.shape)
 
     ecog_400_notch = mf.notch_iir(ecog_400, fs=400, fn=50, Q=30, axis=1, show=False)
     ecog_400_notch = mf.notch_iir(ecog_400_notch, fs=400, fn=100, Q=30, axis=1, show=False)
@@ -392,7 +395,11 @@ def ecog_preprocess(ecog, fs, chs, refs, car, ch_sum, part_sum, band_sum):
 
 
     #print(ecog_ave.shape)
-    ecog_200 = signal.decimate(ecog_ave, int(400/200))
+        
+    # decimateのローパスフィルタの設定が適していないため修正
+    # ecog_200 = signal.decimate(ecog_ave, int(400/200))
+    # 時間軸はaxis=1(shape[-1])
+    ecog_200 = signal.resample(ecog_ave, int(ecog_ave.shape[-1] * 200 / 400), axis=1)
     # print('ecog_200 shape:\t', ecog_200.shape)
 
     ecog_z = stats.zscore(ecog_200, axis=-1)
